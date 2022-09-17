@@ -107,7 +107,7 @@ def main_routine(source_dir, export_dir):
 
 
 
-        # --------------------------------------------- Lib Corporate Snapshot --------------------------------------------------
+        # --------------------------------------------- Lib Corporate Snapshot -----------------------------------------
         print("-"*50)
         print("Snapshot Shapefiles")
 
