@@ -16,6 +16,11 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 2021
+Email: robert.mcgregor@nt.gov.au
 """
 
 # import modules
@@ -66,33 +71,33 @@ def property_export_shapefile_fn(prop_curr_test, pastoral_districts_path, dir_li
         prop_code = prop_curr_test.loc[prop_curr_test['PROPERTY'] == prop_, 'PROP_TAG'].iloc[0]
         currency = prop_curr_test.loc[prop_curr_test['PROPERTY'] == prop_, 'DATE_CURR'].iloc[0]
 
-        property_name = "{0}_{1}".format(prop_code, prop_.replace(' ', '_').title())
-        dist = dist_.replace(' ', '_')
+        property_name = "{0}_{1}".format(prop_code, prop_.replace(' ', '_').lower())
+        dist = dist_.replace(' ', '_').lower() 
 
-        if dist == 'Northern_Alice_Springs':
-            district = 'Northern_Alice'
-        elif dist == 'Southern_Alice_Springs':
-            district = 'Southern_Alice'
-        elif dist == 'Victoria_River':
-            district = 'VRD'
+        if dist == 'northern_alice_springs':
+            district = 'northern_alice'
+        elif dist == 'southern_alice_springs':
+            district = 'southern_alice'
+        elif dist == 'victoria_river':
+            district = 'vrd'
         else:
             district = dist
 
         datetime_object = datetime.strptime(currency, "%Y-%m-%d %H:%M:%S").date()
         date_str = datetime_object.strftime("%Y%m%d")
 
-        output_path = os.path.join(pastoral_districts_path, district, property_name, 'Infrastructure', 'Server_Upload',
+        output_path = os.path.join(pastoral_districts_path, district, property_name, 'infrastructure', 'server_upload',
                                    str(year), dir_list_item)
 
         prop_filter = prop_filter.replace(['Not Recorded'], "")
         prop_filter['UPLOAD'] = 'Migration'
-        output = os.path.join(output_path, "{0}_Migration_{1}.shp".format(dir_list_item.title(), date_str))
+        output = os.path.join(output_path, "{0}_migration_{1}.shp".format(dir_list_item.lower(), date_str))
         prop_filter.to_file(output, driver="ESRI Shapefile")
 
         if 'DELETE' in prop_filter.columns:
             del prop_filter['DELETE']
 
-        prop_filter.to_csv(os.path.join(output_path, "{0}_Migration_{1}.csv".format(dir_list_item.title(), date_str)))
+        prop_filter.to_csv(os.path.join(output_path, "{0}_migration_{1}.csv".format(dir_list_item.lower(), date_str)))
         print(' - Export MIGRATION shapefile to property directory: ', output)
 
 

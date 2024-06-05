@@ -16,6 +16,11 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 2021
+Email: robert.mcgregor@nt.gov.au
 """
 
 # import modules
@@ -88,10 +93,13 @@ def main_routine(year, transition_dir, corporate_working):
     date = datetime.now()
     string_date = date.strftime("%Y%m%d_%H%M%S")
 
+    print("*"*600)
+
     if glob("{0}\\*.pdf".format(for_migration)):
         for pdf_map in glob("{0}\\*.pdf".format(for_migration)):
-            print(' - Located: ', pdf_map)
             print('=' * 50)
+            print(' - Located (for migration): ', pdf_map)
+
             file_list = pdf_map.split('\\')
             orig_file = file_list[-1]
             # print('original file: ', orig_file)
@@ -106,15 +114,15 @@ def main_routine(year, transition_dir, corporate_working):
                     print("orig_file: ", orig_file)
                     print("corp_file: ", corp_file)
                     if orig_file == corp_file:
-                        print('SAME the same file already exists in the corporate library.')
+                        print('The same file already exists in the corporate library, the new version will '
+                              'override the previous version.')
                         print(' - pdf_map: ', pdf_map)
                         print('copied to: ', corp_map)
-                        shutil.copy(pdf_map, corp_map)
+                        shutil.move(pdf_map, corp_map)
 
                         path_list, file_ = pdf_map.rsplit('\\', 1)
                         print('path_list: ', path_list)
                         print('file_: ', file_)
-
 
                     else:
                         print('DIFFERENT - the file is new to to corporate library')
@@ -127,14 +135,11 @@ def main_routine(year, transition_dir, corporate_working):
                         corp_file_list = corp_map.split('\\')
                         corp_file = corp_file_list[-1]
 
-
                         print('-' * 50)
                         corp_output = os.path.join(corporate, orig_file)
                         print(' - pdf_map: ', pdf_map)
                         print('copied to: ', corp_output)
                         shutil.copy(pdf_map, corp_output)
-
-                        # path_list, file_ = pdf_map.rsplit('\\', 1)
 
 
             else:
@@ -148,29 +153,9 @@ def main_routine(year, transition_dir, corporate_working):
                 print("Copied from: ", pdf_map)
                 print("To: ", corp_output)
 
-                # # text_doc = "{0}\\map_transfer.txt".format(path_list)
-                # if os.path.exists(text_doc):
-                #     print('exists')
-                #     # with open(text_doc, 'a') as f:
-                #     #     # f = open(text_doc, "a")
-                #     #     f.write(orig_file)
-                #     #     f.write(
-                #     #         ' is new and was transferred into the corporate library on ')
-                #     #     f.write(string_date)
-                #     #     f.write('.\n')
-                #     #     f.close()
-                # else:
-                #     f = open(text_doc, "w+")
-                #     f.write(orig_file)
-                #     f.write(' is new and was transferred into the corporate library on ')
-                #     f.write(string_date)
-                #     f.write('.\n')
-                #     f.close()
-
 
         print('Deleting: ')
 
-        # Handle errors while calling os.remove()
         try:
             os.remove(pdf_map)
             print(" - ", pdf_map)
@@ -179,6 +164,8 @@ def main_routine(year, transition_dir, corporate_working):
 
     else:
         print('No maps for transfer...')
+
+    print("*" * 600)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,14 @@
 # !/usr/bin/env python
 
 """
+### Description ###
+
+The RMB Pastoral Infrastructure Pipeline is the second half of the Pastoral Infrastructure Workflow.
+This Python Pipeline should only be run following the successful completion of the RMB Pastoral Infrastructure
+Transition Pipeline, and only once the RMB Manager has verified the data. This pipeline creates a backup prior to
+and following the data update, appends the new data into the corporate data set, archives the existing data in the
+corporate data set to the archive data set, overwrites and overwrites the snapshot dataset based on the current date.
+
 Copyright 2021 Robert McGregor
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,6 +24,12 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 2021
+Email: robert.mcgregor@nt.gov.au
+
 """
 
 # import modules
@@ -25,7 +39,6 @@ from datetime import datetime
 from datetime import date
 import argparse
 import shutil
-import sys
 import warnings
 from glob import glob
 import sys
@@ -41,30 +54,30 @@ def cmd_args_fn():
         Lib_Corporate directory. Separate old spatial data and previous maps to the Archive dir.''')
 
     p.add_argument('-x', '--output_dir', type=str, help='Directory path for outputs.',
-                   default=r"Z:\Scratch\Zonal_Stats_Pipeline\rmb_infrastructure_upload\outputs")
+                   default=r"P:\Pipelines\Output\rmb_infrastructure_migrate")
 
     p.add_argument("-pd", "--pastoral_districts",
                    help="Enter path to the Pastoral_Districts directory in the Spatial/Working drive)",
-                   default=r'U:\Pastoral_Districts')
+                   default=r'P:\Pastoral_Districts')
 
     p.add_argument('-y', '--year', type=int, help='Enter the year (i.e. 2001).')
 
     p.add_argument("-r", "--remote_desktop", help="Working on the remote_desktop? - Enter remote_auto, remote, "
                                                   "local or offline.", default="remote")
     p.add_argument('-t', '--transition_dir', type=str, help='Directory path for outputs.',
-                   default=r"U:\Pastoral_Infrastructure\Transition")
+                   default=r"P:\Pastoral_Infrastructure\Transition")
 
     p.add_argument('-a', '--assets_dir', type=str, help='Directory path containing required shapefile structure.',
-                   default=r'E:\DEPWS\code\rangeland_monitoring\rmb_migration_pipeline\assets')
-
+                   default=r'E:\DEPWS\code\prod\rangeland_monitoring\rmb_migration_pipeline\assets')
 
     p.add_argument('-i', '--pastoral_infrastructure', type=str,
                    help='Enter the path to the HIDDEN Pastoral Infrastructure directory - SECURE LOCATION.',
-                   default=r"U:\Data\Pastoral_Infrastructure")
+                   #default=r"P:\Data\past_infra_orig"
+                   default=r"U:\rmb\past_infra_orig")
 
     p.add_argument('-w', '--working_pastoral_infrastructure', type=str,
                    help='Enter the path to the WORKING DRIVE Pastoral Infrastructure directory - U DRIVE.',
-                   default=r"U:\Pastoral_Infrastructure")
+                   default=r"P:\Pastoral_Infrastructure")
 
 
     cmd_args = p.parse_args()
@@ -155,7 +168,6 @@ def dir_folders_2_fn(direc, directory_list, type_):
     Create directory tree within the transitory directory based on shapefile type.
 
     :param type_: string object containing the sub-directory name.
-    :param year: integer object containing the current year.
     :param direc: string object containing the path to the transitory directory.
     :param directory_list: list object containing the shapefile types.
     """
@@ -177,12 +189,14 @@ def dir_folders_2_fn(direc, directory_list, type_):
             print(" - created: ", shapefile_dir)
 
 
+    return previous_dir
+
+
 def dir_folders_3_fn(direc, directory_list, type_):
     """
     Create directory tree within the transitory directory based on shapefile type.
 
     :param type_: string object containing the sub-directory name.
-    :param year: integer object containing the current year.
     :param direc: string object containing the path to the transitory directory.
     :param directory_list: list object containing the shapefile types.
     """
@@ -209,6 +223,7 @@ def next_subfolder_fn(path_to_parent):
         return next(os.walk(path_to_parent))[1]
     except StopIteration:
         return []
+
 
 def main_routine():
     """ This pipeline transfers finalised infrastructure data from the transition directory to the migration directory.
@@ -241,9 +256,13 @@ def main_routine():
     import step2_7_backup_infrastructure
     step2_7_backup_infrastructure.main_routine(pastoral_infrastructure, "Pre")
 
-    pastoral_estate = assets_search_fn("NT_Pastoral_Estate.shp", "assets\\shapefile")
+    #pastoral_estate = assets_search_fn("NT_Pastoral_Estate.shp", "assets\\shapefile")
+    asset_search = os.path.join('assets','shapefile')
+    pastoral_estate = assets_search_fn("NT_Pastoral_Estate.shp", asset_search)
 
-    directory_list = ["Points", "Lines", "Polygons", "Paddocks"]
+
+    # directory_list = ["Points", "Lines", "Polygons", "Paddocks"]
+    directory_list = ["points", "lines", "polygons", "paddocks"]
 
     final_user = user_id_fn()
 
@@ -251,19 +270,24 @@ def main_routine():
     primary_output_dir = export_file_path_fn(output_dir, final_user)
 
     # create subdirectories within the export directory
-    final_migration_output_dir = dir_folders_2_fn(primary_output_dir, directory_list, 'Final_Migration')
+    final_migration_output_dir = dir_folders_2_fn(primary_output_dir, directory_list, 'final_migration')
 
-    faulty_output_dir = dir_folders_2_fn(primary_output_dir, directory_list, 'Faulty')
+    faulty_output_dir = dir_folders_2_fn(primary_output_dir, directory_list, 'faulty')
+    print("faulty_output_dir: ", faulty_output_dir)
+
 
     import step2_2_search_folders
     step2_2_search_folders.main_routine(
         pastoral_districts_path, transition_dir, corporate_infrastructure, archive_infrastructure, year, output_dir,
     faulty_output_dir)
 
+    
     # delete files within for migration directory
     for feature_type in directory_list:
-        for_migration_path = os.path.join(transition_dir, "For_Migration", feature_type)
-        # print("for_migration_path: ", for_migration_path)
+        for_migration_path = os.path.join(transition_dir, "for_migration", feature_type)
+        #print("for_migration_path: ", for_migration_path)
+
+
         if glob("{0}\\*".format(for_migration_path)):
             print('-' * 30)
             print("Deleting...")
@@ -286,8 +310,8 @@ def main_routine():
     step2_6_pdf_maps.main_routine(
         year, transition_dir, pastoral_infrastructure)
 
-    import step2_7_backup_infrastructure
-    step2_7_backup_infrastructure.main_routine(pastoral_infrastructure, "Post")
+    # import step2_7_backup_infrastructure
+    # step2_7_backup_infrastructure.main_routine(pastoral_infrastructure, "Post")
 
     import step2_8_create_annual_snapshot
     step2_8_create_annual_snapshot.main_routine(pastoral_infrastructure)

@@ -16,6 +16,11 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 2021
+Email: robert.mcgregor@nt.gov.au
 """
 
 # import modules
@@ -95,11 +100,10 @@ def work_flow_fn(migration_dir, feature_type):
     if dir_string:
         migration_dir_list.append(dir_string)
         # create the file path to the relevant shapefile
-        shapefile = "{0}\\Pastoral_Infra_{1}.shp".format(dir_string, feature_type.title())
+        shapefile = "{0}\\Pastoral_Infra_{1}.shp".format(dir_string, feature_type.lower())
         # append the file path to a list so that all data can be deleted at the end of the script.
         # Create a Boolean variable as to whether the file exists or not
         check_file = os.path.exists(shapefile)
-
 
         if check_file:
             print('Processing: ', feature_type)
@@ -177,69 +181,83 @@ def main_routine(pastoral_districts_path, migration_dir, corporate_infrastructur
     This script searches through sub-directories and manages the feature type workflow.
     """
 
+    print("Searching for Migration data .......")
+
     # ------------------------------------------------- POINTS ---------------------------------------------------------
 
-    correct_points_list, faulty_points_list = work_flow_fn(migration_dir, 'Points')
+    correct_points_list, faulty_points_list = work_flow_fn(migration_dir, 'points')
 
     if len(correct_points_list) > 0:
         import step2_3_append_lib_corporate_data
         step2_3_append_lib_corporate_data.main_routine(
-            correct_points_list, 'Points', corporate_infrastructure, archive_infrastructure)
+            correct_points_list, 'points', corporate_infrastructure, archive_infrastructure)
 
         import step2_5_export_data_to_property
-        step2_5_export_data_to_property.main_routine(correct_points_list, pastoral_districts_path, 'Points', str(year))
+        step2_5_export_data_to_property.main_routine(correct_points_list, pastoral_districts_path, 'points', str(year))
 
     if len(faulty_points_list) > 0:
+        print("ERROR -- FAULTY POINTS "*30)
+        print("faulty_output_dir: ", faulty_output_dir)
+        points_faulty_output_dir = os.path.join(faulty_points_list, "points")
         import step2_4_export_faulty_data
-        step2_4_export_faulty_data.main_routine(faulty_points_list,  'Points', output_dir, faulty_output_dir)
+        step2_4_export_faulty_data.main_routine(faulty_points_list,  'points', output_dir, points_faulty_output_dir)
 
     # ------------------------------------------------- LINES ----------------------------------------------------------
 
-    correct_lines_list, faulty_lines_list = work_flow_fn(migration_dir, 'Lines')
+    correct_lines_list, faulty_lines_list = work_flow_fn(migration_dir, 'lines')
 
     if len(correct_lines_list) > 0:
         import step2_3_append_lib_corporate_data
         step2_3_append_lib_corporate_data.main_routine(
-            correct_lines_list, 'Lines', corporate_infrastructure, archive_infrastructure)
+            correct_lines_list, 'lines', corporate_infrastructure, archive_infrastructure)
 
         import step2_5_export_data_to_property
-        step2_5_export_data_to_property.main_routine(correct_lines_list, pastoral_districts_path, 'Lines', str(year))
+        step2_5_export_data_to_property.main_routine(correct_lines_list, pastoral_districts_path, 'lines', str(year))
 
     if len(faulty_lines_list) > 0:
+        print("ERROR -- FAULTY LINES" * 30)
+        print("faulty_output_dir: ", faulty_output_dir)
+        lines_faulty_output_dir = os.path.join(faulty_points_list, "lines")
         import step2_4_export_faulty_data
-        step2_4_export_faulty_data.main_routine(faulty_lines_list,  'Lines', output_dir, faulty_output_dir)
+        step2_4_export_faulty_data.main_routine(faulty_lines_list,  'lines', output_dir, lines_faulty_output_dir)
 
     # ------------------------------------------------- PADDOCKS -------------------------------------------------------
 
-    correct_paddocks_list, faulty_paddocks_list = work_flow_fn(migration_dir, 'Paddocks')
+    correct_paddocks_list, faulty_paddocks_list = work_flow_fn(migration_dir, 'paddocks')
 
     if len(correct_paddocks_list) > 0:
         import step2_3_append_lib_corporate_data
-        step2_3_append_lib_corporate_data.main_routine(correct_paddocks_list, 'Paddocks', corporate_infrastructure,
+        step2_3_append_lib_corporate_data.main_routine(correct_paddocks_list, 'paddocks', corporate_infrastructure,
                                                        archive_infrastructure)
 
         import step2_5_export_data_to_property
-        step2_5_export_data_to_property.main_routine(correct_paddocks_list, pastoral_districts_path, 'Paddocks', str(year))
+        step2_5_export_data_to_property.main_routine(correct_paddocks_list, pastoral_districts_path, 'paddocks', str(year))
 
     if len(faulty_paddocks_list) > 0:
+        print("ERROR -- FAULTY PADDOCKS" * 30)
+        print("faulty_output_dir: ", faulty_output_dir)
+        paddocks_faulty_output_dir = os.path.join(faulty_points_list, "paddocks")
         import step2_4_export_faulty_data
-        step2_4_export_faulty_data.main_routine(faulty_paddocks_list,  'Paddocks', output_dir, faulty_output_dir)
+        step2_4_export_faulty_data.main_routine(faulty_paddocks_list,  'paddocks', output_dir, paddocks_faulty_output_dir)
 
     # ----------------------------------------------- POLYGONS ---------------------------------------------------------
 
-    correct_polygons_list, faulty_polygons_list = work_flow_fn(migration_dir, 'Polygons')
+    correct_polygons_list, faulty_polygons_list = work_flow_fn(migration_dir, 'polygons')
 
     if len(correct_polygons_list) > 0:
         import step2_3_append_lib_corporate_data
-        step2_3_append_lib_corporate_data.main_routine(correct_polygons_list, 'Polygons', corporate_infrastructure,
+        step2_3_append_lib_corporate_data.main_routine(correct_polygons_list, 'polygons', corporate_infrastructure,
                                                        archive_infrastructure)
 
         import step2_5_export_data_to_property
-        step2_5_export_data_to_property.main_routine(correct_polygons_list, pastoral_districts_path, 'Polygons', str(year))
+        step2_5_export_data_to_property.main_routine(correct_polygons_list, pastoral_districts_path, 'polygons', str(year))
 
     if len(faulty_polygons_list) > 0:
+        print("ERROR -- FAULTY POLYGONS" * 30)
+        print("faulty_output_dir: ", faulty_output_dir)
+        polygons_faulty_output_dir = os.path.join(faulty_points_list, "polygons")
         import step2_4_export_faulty_data
-        step2_4_export_faulty_data.main_routine(faulty_polygons_list,  'Polygons', output_dir, faulty_output_dir)
+        step2_4_export_faulty_data.main_routine(faulty_polygons_list,  'polygons', output_dir, polygonsfaulty_output_dir)
 
 
 if __name__ == '__main__':

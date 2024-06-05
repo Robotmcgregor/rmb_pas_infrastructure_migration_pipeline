@@ -1,16 +1,32 @@
 #!/usr/bin/env python
 """
+### Description ###
 This script automates the back of the pastoral infrastructure database and map drives.
-Author: Rob McGregor
-Date: 04/11/2021
 
+Copyright 2021 Robert McGregor
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 04/11/2021
+Email: robert.mcgregor@nt.gov.au
 """
 # from __future__ import print_function, division
 
-# import the requried modules
-# import sys
-# import os
-# import argparse
+# import the required modules
 import shutil
 from datetime import datetime
 from glob import glob
@@ -32,12 +48,10 @@ def main_routine(source_dir, bu_var):
     them in the U drive Pastoral Infrastructure Backup directory.
     """
     print('Pastoral infrastructure backup is in progress........')
-    #source_dir = r"U:\Pastoral_Infrastructure"
 
-    # dest = r"Z:\Scratch\past_infa_backup"
 
     # create a directory
-    dest = os.path.join(source_dir, "Pastoral_Infrastructure_Backup")
+    dest = os.path.join(source_dir, "Past_Infra_Backup")
     mk_dir(dest)
 
     # dest = r"U:\Pastoral_Infrastructure\Pastoral_Infrastructure_Backup"

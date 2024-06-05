@@ -16,6 +16,11 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+Author: Robert McGregor
+Date: 2021
+Email: robert.mcgregor@nt.gov.au
 """
 
 # import modules
@@ -441,15 +446,21 @@ def main_routine(correct_list, feature_type, corporate_infrastructure, archive_i
     """
     print('='*50)
     print("Working on ", feature_type)
+
+
+
     clean_gdf = clean_gdf_fn(correct_list)
     gdf = date_curr_update_fn(clean_gdf)
 
-    if feature_type == "Paddocks":
-        updated_feature_type = "Polys_Paddocks"
+    if feature_type == "paddocks":
+        updated_feature_type = "polys_paddocks"
     elif feature_type == "Polygons":
-        updated_feature_type = "Polys_Other"
+        updated_feature_type = "polys_other"
     else:
         updated_feature_type = feature_type.title()
+
+
+
 
     corporate_infrastructure_file = os.path.join(corporate_infrastructure, "Pastoral_Infra_{0}.shp".format(
         updated_feature_type))
@@ -479,6 +490,7 @@ def main_routine(correct_list, feature_type, corporate_infrastructure, archive_i
         print(' -- ERROR...... Lib Corporate data is missing please verify data exists and check your path')
         import sys
         sys.exit()
+
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -539,10 +551,15 @@ def main_routine(correct_list, feature_type, corporate_infrastructure, archive_i
     if 'DELETE' in corp_final.columns:
         del corp_final['DELETE']
 
+    #corp_final.to_file(r"P:\Data\scratch\test.shp", driver="ESRI Shapefile")
+
+    print(corp_schema)
+
+    print("output to: ", corporate_infrastructure_file)
+
+
     corp_final.to_file(corporate_infrastructure_file, driver="ESRI Shapefile", schema=corp_schema)
 
-    # print('stop here. ')
-    # import sys
-    # sys.exit()
+
 if __name__ == '__main__':
     main_routine()
